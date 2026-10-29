@@ -1,7 +1,7 @@
 # kwtSMS for Joomla
 
-[![CI](https://github.com/boxlinknet/kwtsms-joomla/actions/workflows/ci.yml/badge.svg)](https://github.com/boxlinknet/kwtsms-joomla/actions/workflows/ci.yml)
-[![Latest Release](https://img.shields.io/github/v/release/boxlinknet/kwtsms-joomla)](https://github.com/boxlinknet/kwtsms-joomla/releases/latest)
+[![CI](https://github.com/kwtsms/kwtsms-joomla/actions/workflows/ci.yml/badge.svg)](https://github.com/kwtsms/kwtsms-joomla/actions/workflows/ci.yml)
+[![Latest Release](https://img.shields.io/github/v/release/kwtsms/kwtsms-joomla)](https://github.com/kwtsms/kwtsms-joomla/releases/latest)
 [![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php&logoColor=white)](https://www.php.net)
 [![Joomla](https://img.shields.io/badge/Joomla-4%2B-1A3867?logo=joomla&logoColor=white)](https://www.joomla.org)
 [![License](https://img.shields.io/badge/License-GPL%20v2%2B-blue)](LICENSE)
@@ -69,7 +69,7 @@ Get your API credentials from your kwtSMS account at [www.kwtsms.com](https://ww
 - [Sender ID Help](https://www.kwtsms.com/sender-id-help.html): Sender ID registration and guidelines.
 - [kwtSMS Dashboard](https://www.kwtsms.com/login/): Recharge credits, buy Sender IDs, view message logs, and manage coverage.
 - [Other Integrations](https://www.kwtsms.com/integrations.html): Plugins and integrations for other platforms and languages.
-- [Plugin Issues](https://github.com/boxlinknet/kwtsms-joomla/issues): Report bugs or request features.
+- [Plugin Issues](https://github.com/kwtsms/kwtsms-joomla/issues): Report bugs or request features.
 
 ## License
 
