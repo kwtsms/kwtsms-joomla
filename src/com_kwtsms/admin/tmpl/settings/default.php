@@ -169,9 +169,10 @@ $isLoggedIn = $this->settings['gateway_configured'] === '1' && $this->settings['
 				<div class="row mb-3">
 					<label class="col-sm-3 col-form-label" for="admin_phone"><?php echo Text::_('COM_KWTSMS_ADMIN_PHONE'); ?></label>
 					<div class="col-sm-6">
+						<?php // 2026-11-05 11:08 +03: placeholder 965XXXXXXXX replaces a sample mobile number that belongs to a real person, int-testnumber ?>
 						<input type="text" class="form-control" id="admin_phone" name="admin_phone"
 							   value="<?php echo htmlspecialchars($this->settings['admin_phone'], ENT_QUOTES, 'UTF-8'); ?>"
-							   placeholder="96598765432" maxlength="15" pattern="\d{7,15}">
+							   placeholder="965XXXXXXXX" maxlength="15" pattern="\d{7,15}">
 						<div class="form-text"><?php echo Text::_('COM_KWTSMS_ADMIN_PHONE_HINT'); ?></div>
 					</div>
 				</div>

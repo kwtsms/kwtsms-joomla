@@ -4,6 +4,9 @@ All notable changes to kwtSMS for Joomla will be documented here.
 
 ## [Unreleased]
 
+### Changed
+- Docs and examples use the placeholder 965XXXXXXXX instead of a sample mobile number.
+
 ### Added
 - Initial release
 - pkg_kwtsms package bundling com_kwtsms, plg_system_kwtsms, plg_task_kwtsms, plg_vmcustom_kwtsms

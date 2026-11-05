@@ -160,8 +160,9 @@ $gatewayOk = $this->status['gateway_enabled'] === '1' && $this->status['gateway_
 				<div class="row mb-3">
 					<label class="col-sm-3 col-form-label" for="test_phone"><?php echo Text::_('COM_KWTSMS_TEST_PHONE'); ?></label>
 					<div class="col-sm-4">
+						<?php // 2026-11-05 11:08 +03: placeholder 965XXXXXXXX replaces a sample mobile number that belongs to a real person, int-testnumber ?>
 						<input type="text" class="form-control" id="test_phone" name="test_phone"
-							   placeholder="96598765432" maxlength="15" pattern="\d{7,15}"
+							   placeholder="965XXXXXXXX" maxlength="15" pattern="\d{7,15}"
 							   required>
 						<div class="form-text"><?php echo Text::_('COM_KWTSMS_TEST_PHONE_HINT'); ?></div>
 					</div>
