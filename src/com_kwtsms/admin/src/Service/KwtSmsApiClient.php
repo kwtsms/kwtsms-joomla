@@ -657,6 +657,32 @@ final class KwtSmsApiClient
     }
 
     /**
+     * User-Agent token sent to kwtSMS: "kwtsms-joomla/<version>".
+     * The version is the <version> of the component manifest kwtsms.xml (installed next to src/,
+     * one level higher in the source tree).
+     * 2026-11-05 14:58 +03: added so kwtSMS can count accounts per integration (name and version only,
+     * no personal data), #939.
+     */
+    public function getUserAgent(): string
+    {
+        static $userAgent = null;
+
+        if ($userAgent === null) {
+            $version = '0';
+            foreach ([dirname(__DIR__, 2), dirname(__DIR__, 3)] as $dir) {
+                $xml = @file_get_contents($dir . '/kwtsms.xml');
+                if (is_string($xml) && preg_match('#<version>\s*([^<\s]+)\s*</version>#', $xml, $m)) {
+                    $version = $m[1];
+                    break;
+                }
+            }
+            $userAgent = 'kwtsms-joomla/' . preg_replace('/[^0-9A-Za-z.+-]/', '', $version);
+        }
+
+        return $userAgent;
+    }
+
+    /**
      * POST a request to the kwtSMS API and return decoded JSON.
      */
     private function post(string $endpoint, array $payload): array
@@ -668,10 +694,12 @@ final class KwtSmsApiClient
         $json = json_encode($payload);
 
         $ch = curl_init($url);
+        // 2026-11-05 14:58 +03: CURLOPT_USERAGENT identifies the extension and its version to kwtSMS, #939.
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $json,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_USERAGENT      => $this->getUserAgent(),
             CURLOPT_HTTPHEADER     => [
                 'Content-Type: application/json',
                 'Accept: application/json',

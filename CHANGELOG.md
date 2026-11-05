@@ -8,6 +8,7 @@ All notable changes to kwtSMS for Joomla will be documented here.
 - Docs and examples use the placeholder 965XXXXXXXX instead of a sample mobile number.
 
 ### Added
+- Requests to kwtSMS carry the integration name and version (no personal data) so kwtSMS can see which integrations are in use.
 - Initial release
 - pkg_kwtsms package bundling com_kwtsms, plg_system_kwtsms, plg_task_kwtsms, plg_vmcustom_kwtsms
 - 6-tab admin panel: Dashboard, Settings, Templates, Integrations, Logs, Help
