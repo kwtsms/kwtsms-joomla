@@ -17,7 +17,7 @@ for ext in com_kwtsms plg_system_kwtsms plg_task_kwtsms plg_vmcustom_kwtsms; do
     (cd "${SRC_DIR}/${ext}" && zip -r "../../${BUILD_DIR}/pkg_kwtsms/constituents/${ext}.zip" . \
         --exclude "*.DS_Store" \
         --exclude "__MACOSX/*" \
-        --exclude ".gitkeep")
+        --exclude "*.gitkeep")  # 2026-11-06 00:02 +03: was ".gitkeep", which matched only the zip root; ci-dryrun-all
 done
 
 # Copy package manifest and language files into pkg dir
