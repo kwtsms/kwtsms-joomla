@@ -1,0 +1,90 @@
+# FILE:      .github/workflows/joomla-install.yml
+# CREATED:   2026-11-07 09:06 +03
+# TASK:      joomla-ci-install
+# AUTHOR:    M Alhassoun
+# WHAT:      Builds pkg_kwtsms with build.sh, installs it on a fresh Joomla 5 and Joomla 6 (official Docker images,
+#            MySQL 8) with Joomla's CLI, checks the four kwtSMS tables and seeded rows exist, then on Joomla 6 sends
+#            one SMS through the component with test=1 to the test number (queued, never delivered).
+# WHY:       1.3.0 shipped with install SQL in the wrong manifest place: fresh installs had no tables. This job fails
+#            on that before a release instead of after.
+# USAGE:     Runs on pull requests to main and by hand (Actions > Joomla install > Run workflow).
+# DEPENDS:   Docker on the GitHub runner. Secrets KWTSMS_USERNAME, KWTSMS_PASSWORD, KWTSMS_TEST_NUMBER for the live
+#            step (skipped when absent, for example on forks).
+name: Joomla install
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    name: Joomla ${{ matrix.joomla }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - joomla: "5"
+            live: false
+          - joomla: "6"
+            live: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the package
+        run: |
+          bash build.sh
+          ls -la build/*.zip
+
+      - name: Start MySQL and Joomla ${{ matrix.joomla }}
+        run: |
+          docker network create jnet
+          docker run -d --name db --network jnet -e MYSQL_ROOT_PASSWORD=ci -e MYSQL_DATABASE=joomla_db \
+            -e MYSQL_USER=joomla -e MYSQL_PASSWORD=ci mysql:8.0
+          until docker exec db mysqladmin ping -h 127.0.0.1 -pci --silent; do sleep 3; done
+          docker run -d --name web --network jnet -p 8080:80 \
+            -e JOOMLA_DB_HOST=db -e JOOMLA_DB_USER=joomla -e JOOMLA_DB_PASSWORD=ci -e JOOMLA_DB_NAME=joomla_db \
+            -e JOOMLA_SITE_NAME="kwtSMS CI" -e JOOMLA_ADMIN_USER="CI Admin" -e JOOMLA_ADMIN_USERNAME=ciadmin \
+            -e JOOMLA_ADMIN_PASSWORD="Ci$(openssl rand -hex 8)" -e JOOMLA_ADMIN_EMAIL=ci.admin@example.com \
+            joomla:${{ matrix.joomla }}
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/administrator/ || true)
+            [ "$code" = "200" ] && break; sleep 5
+          done
+          [ "$code" = "200" ]
+          docker exec web sh -c 'grep -oE "(MAJOR|MINOR|PATCH)_VERSION = [0-9]+" /var/www/html/libraries/src/Version.php; php -v | head -1'
+
+      - name: Install the package with Joomla's CLI
+        run: |
+          docker cp build/pkg_kwtsms-*.zip web:/tmp/pkg.zip
+          docker exec -u www-data web php /var/www/html/cli/joomla.php extension:install --path=/tmp/pkg.zip
+          docker exec -u www-data web php /var/www/html/cli/joomla.php extension:list | grep -i kwtsms
+
+      - name: Tables and seeded rows exist
+        run: |
+          prefix=$(docker exec web php -r 'require "/var/www/html/configuration.php"; echo (new JConfig())->dbprefix;')
+          tables=$(docker exec db mysql -uroot -pci joomla_db -N -e "SHOW TABLES LIKE '${prefix}kwtsms%'" 2>/dev/null | wc -l)
+          settings=$(docker exec db mysql -uroot -pci joomla_db -N -e "SELECT COUNT(*) FROM ${prefix}kwtsms_settings" 2>/dev/null)
+          templates=$(docker exec db mysql -uroot -pci joomla_db -N -e "SELECT COUNT(*) FROM ${prefix}kwtsms_templates" 2>/dev/null)
+          echo "tables=$tables settings=$settings templates=$templates"
+          [ "$tables" -eq 4 ] && [ "$settings" -gt 0 ] && [ "$templates" -gt 0 ]
+
+      - name: One live send through the component (test=1)
+        if: matrix.live
+        env:
+          KWTSMS_USERNAME: ${{ secrets.KWTSMS_USERNAME }}
+          KWTSMS_PASSWORD: ${{ secrets.KWTSMS_PASSWORD }}
+          KWTSMS_TEST_NUMBER: ${{ secrets.KWTSMS_TEST_NUMBER }}
+        run: |
+          if [ -z "$KWTSMS_USERNAME" ] || [ -z "$KWTSMS_TEST_NUMBER" ]; then echo "No credentials (fork?): skipped"; exit 0; fi
+          docker cp .github/ci/live-send.php web:/tmp/live-send.php
+          docker exec -u www-data -e KWTSMS_USERNAME -e KWTSMS_PASSWORD -e KWTSMS_TEST_NUMBER web php /tmp/live-send.php
+
+      - name: Container log on failure
+        if: failure()
+        run: docker logs web 2>&1 | tail -50
