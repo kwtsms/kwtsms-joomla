@@ -261,9 +261,17 @@ final class KwtSmsApiClient
             return false;
         }
 
-        $prefix = substr($normalizedPhone, 0, 3);
+        // 2026-11-07 15:06 +03: match prefixes of any length (1, 44, 965...): the first-3-digits compare never matched 1- or
+        // 2-digit country codes. Task joomla-coverage-prefix.
+        foreach ($coverage as $prefix) {
+            $prefix = (string) $prefix;
 
-        return in_array($prefix, $coverage, true);
+            if ($prefix !== '' && str_starts_with($normalizedPhone, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
