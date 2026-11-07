@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="1.3.0"
+VERSION="1.3.1"
 BUILD_DIR="build"
 SRC_DIR="src"
 

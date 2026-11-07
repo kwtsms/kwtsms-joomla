@@ -108,7 +108,8 @@ final class Kwtsms extends CMSPlugin implements SubscriberInterface
                 return true;
             }
 
-            $sender = $settings->get('sender_id', 'KWT-SMS');
+            // 2026-11-07 03:32 +03: install seeds sender_id as '' so the get() default never applied (ERR002); task int-rerelease-number.
+            $sender = $settings->get('sender_id', 'KWT-SMS') ?: 'KWT-SMS';
 
             $client->send([$phone], $message, $sender, $settings, null, 'customer');
         } catch (\Throwable $e) {
@@ -152,7 +153,8 @@ final class Kwtsms extends CMSPlugin implements SubscriberInterface
                 return true;
             }
 
-            $sender   = $settings->get('sender_id', 'KWT-SMS');
+            // 2026-11-07 03:32 +03: install seeds sender_id as '' so the get() default never applied (ERR002); task int-rerelease-number.
+            $sender   = $settings->get('sender_id', 'KWT-SMS') ?: 'KWT-SMS';
             $shopName = Factory::getApplication()->get('sitename', 'Our Shop');
 
             foreach ($orders as $order) {

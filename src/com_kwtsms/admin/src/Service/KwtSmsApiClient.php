@@ -493,8 +493,11 @@ final class KwtSmsApiClient
         }
 
         // 7. Coverage filter
-        if ($settings !== null) {
-            $coverage    = $settings->getCoverage();
+        // 2026-11-07 03:31 +03: skipped while coverage was never synced (empty list): credentials saved with Save instead of
+        // Login left it empty and every send was refused as outside coverage. kwtSMS still rejects uncovered numbers
+        // itself. Found in the Joomla 6.2.0 Docker QA, task int-rerelease-number.
+        $coverage = $settings !== null ? $settings->getCoverage() : [];
+        if ($settings !== null && $coverage !== []) {
             $beforeCount = count($normalized);
             $normalized  = array_values(array_filter(
                 $normalized,
