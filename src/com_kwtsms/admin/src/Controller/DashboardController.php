@@ -117,7 +117,8 @@ final class DashboardController extends BaseController
 			}
 
 			$client   = new KwtSmsApiClient($creds['username'], $creds['password']);
-			$sender   = $settings->get('sender_id', 'KWT-SMS');
+			// 2026-11-07 03:32 +03: install seeds sender_id as '' so the get() default never applied (ERR002); task int-rerelease-number.
+			$sender   = $settings->get('sender_id', 'KWT-SMS') ?: 'KWT-SMS';
 			$response = $client->send([$phone], $message, $sender, $settings, $log, 'test');
 			$result   = $response['result'] ?? 'ERROR';
 			$testMode = $settings->get('test_mode', '1') === '1';
