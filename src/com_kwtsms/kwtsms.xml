@@ -59,7 +59,6 @@
 		</languages>
 	</administration>
 
-	<updateservers>
-		<server type="extension" priority="1" name="kwtSMS Update Server">https://www.kwtsms.com/joomla/update.xml</server>
-	</updateservers>
+	<!-- 2026-11-07 15:08 +03: component update server removed: https://www.kwtsms.com/joomla/update.xml returns 404; updates come
+	     through the package (pkg_kwtsms.xml, GitHub update.xml). Task joomla-updateserver-404. -->
 </extension>
