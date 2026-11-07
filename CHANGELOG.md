@@ -4,6 +4,9 @@ All notable changes to kwtSMS for Joomla will be documented here.
 
 ## [Unreleased]
 
+### Fixed
+- Coverage check for countries with one- or two-digit country codes.
+
 ## [1.3.1] - 2026-11-07
 
 ### Fixed
