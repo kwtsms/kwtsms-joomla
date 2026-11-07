@@ -67,10 +67,14 @@ jobs:
 
       - name: Tables and seeded rows exist
         run: |
-          prefix=$(docker exec web php -r 'require "/var/www/html/configuration.php"; echo (new JConfig())->dbprefix;')
-          tables=$(docker exec db mysql -uroot -pci joomla_db -N -e "SHOW TABLES LIKE '${prefix}kwtsms%'" 2>/dev/null | wc -l)
-          settings=$(docker exec db mysql -uroot -pci joomla_db -N -e "SELECT COUNT(*) FROM ${prefix}kwtsms_settings" 2>/dev/null)
-          templates=$(docker exec db mysql -uroot -pci joomla_db -N -e "SELECT COUNT(*) FROM ${prefix}kwtsms_templates" 2>/dev/null)
+          q() { docker exec db mysql -uroot -pci joomla_db -N -e "$1" 2>/dev/null; }
+          st=$(q "SHOW TABLES LIKE '%kwtsms_settings'" || true)
+          echo "settings table: ${st:-missing}"
+          [ -n "$st" ] || exit 1
+          prefix=${st%kwtsms_settings}
+          tables=$(q "SHOW TABLES LIKE '${prefix}kwtsms%'" | wc -l)
+          settings=$(q "SELECT COUNT(*) FROM ${prefix}kwtsms_settings")
+          templates=$(q "SELECT COUNT(*) FROM ${prefix}kwtsms_templates")
           echo "tables=$tables settings=$settings templates=$templates"
           [ "$tables" -eq 4 ] && [ "$settings" -gt 0 ] && [ "$templates" -gt 0 ]
 
