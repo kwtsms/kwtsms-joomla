@@ -14,6 +14,8 @@
 Send SMS to your VirtueMart customers when they order and when their order status changes, through kwtSMS, the
 Kuwaiti SMS gateway.
 
+All kwtSMS integrations: [kwtsms.com/integrations](https://www.kwtsms.com/integrations/)
+
 kwtSMS delivers to Zain, Ooredoo, STC and Virgin in Kuwait and to more than 200 countries, with your own Sender ID,
 free API testing and credits that do not expire.
 
